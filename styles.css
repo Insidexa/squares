@@ -1,0 +1,77 @@
+.squares {
+  margin-left: 40px;
+  margin-top: 40px;
+}
+
+.matrix {
+  border: 1px solid #4DA1E4;
+  padding: 1px;
+  display: inline-block;
+  float: left;
+}
+
+.el-size {
+  width: 30px;
+  height: 30px;
+  margin: 1px;
+}
+
+.el {
+  float: left;
+  background-color: #4B9FE4;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.control {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 30px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.5s ease;
+}
+
+.control-add-bg {
+  background-color: #ee9d00;
+}
+
+.control-add:hover {
+  background-color: #F2BC47;
+}
+
+.control-row-add-clearfix {
+  margin-left: 4px;
+  content: "";
+  clear: both;
+  display: table;
+  top: 0px;
+  left: 10px;
+}
+
+.control-remove {
+  background-color: #A90011;
+  position: absolute;
+  -webkit-transition: 0.3s ease-in-out;
+  -moz-transition: 0.3s ease-in-out;
+  -o-transition: 0.3s ease-in-out;
+  transition: 0.3s ease-in-out;
+}
+
+.control-remove:hover {
+  background-color: #C23644;
+}
+
+.control-remove-row {
+  left: 16px;
+}
+
+.control-remove-col {
+  top: 8px;
+}
+
