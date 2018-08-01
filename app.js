@@ -1,4 +1,4 @@
-kconst matrixEl = document.querySelector('.matrix');
+const matrixEl = document.querySelector('.matrix');
 const squresEl = document.querySelector('.squares');
 const INIT_ROWS = 4;
 const INIT_COLS = 4;
@@ -36,6 +36,7 @@ function clearDomMatrix() {
 }
 
 function render(matrix) {
+  clearDomMatrix();
   state.matrix = matrix;
   for (let rowIndex = 0; rowIndex < matrix.length; ++rowIndex) {
     for (let colIndex = 0; colIndex < matrix[rowIndex].length; ++colIndex) {
@@ -51,15 +52,11 @@ function render(matrix) {
 }
 
 function addColumn(oldMatrix) {
-  clearDomMatrix();
-  const matrix = defaultMatrix(oldMatrix.length, oldMatrix[0].length + 1);
-  render(matrix);
+  return defaultMatrix(oldMatrix.length, oldMatrix[0].length + 1);
 }
 
 function addRow(oldMatrix) {
-  clearDomMatrix();
-  const matrix = defaultMatrix(oldMatrix.length + 1, oldMatrix[0].length);
-  render(matrix);
+  return defaultMatrix(oldMatrix.length + 1, oldMatrix[0].length);
 }
 
 function makeControl({
@@ -67,7 +64,7 @@ function makeControl({
   classes,
   handler
 }) {
-  const control = document.createElement('div');
+  const control = document.createElement('button');
   control.textContent = text;
   control.classList.add(...classes);
   control.addEventListener('click', handler);
@@ -75,16 +72,17 @@ function makeControl({
   return control;
 }
 
-function removeRow(matrix) {
-  clearDomMatrix();
-  console.log('remove row by index', state.currentPosition.row)
+function removeRow(rowBtn, matrix) {
   matrix.splice(state.currentPosition.row, 1);
-  render(matrix);
+  
+  if (!isAvailableBtnRemoveRow()) {
+  	changeOpacity(rowBtn, 0);
+  }
+  
+  return matrix;
 }
 
-function removeCol(matrix) {
-  clearDomMatrix();
-  console.log('remove row by index', state.currentPosition.col)
+function removeCol(colBtn, matrix) {
   for (let rowIndex = 0; rowIndex < matrix.length; ++rowIndex) {
     for (let colIndex = 0; colIndex < matrix[rowIndex].length; ++colIndex) {
       if (state.currentPosition.col === colIndex) {
@@ -92,7 +90,19 @@ function removeCol(matrix) {
       }
     }
   }
-  render(matrix);
+  
+  if (!isAvailableBtnRemoveCol()) {
+  	changeOpacity(colBtn, 0);
+  }
+  
+  return matrix;
+}
+
+function wrapControl(fn) {
+    return function (...arguments) {
+        const matrix = fn.apply(null, arguments);
+        render(matrix);
+    }
 }
 
 function addControls() {
@@ -103,27 +113,26 @@ function addControls() {
   const addColBtn = makeControl({
     text: textAdd,
     classes: ['control-add-bg', 'control-add', 'margin'].concat(baseClasses),
-    handler: () => addColumn(state.matrix)
+    handler: () => wrapControl(addColumn)(state.matrix)
   });
 
   const addRowBtn = makeControl({
     text: textAdd,
     classes: ['control-add-bg', 'control-row-add-clearfix', 'control-add'].concat(baseClasses),
-    handler: () => addRow(state.matrix)
+    handler: () => wrapControl(addRow)(state.matrix)
   });
-
 
 
   const removeRowBtn = makeControl({
     text: textRemove,
     classes: ['control-remove', 'control-remove-row'].concat(baseClasses),
-    handler: () => removeRow(state.matrix)
+    handler: () => wrapControl(removeRow)(removeRowBtn, state.matrix)
   });
 
   const removeColBtn = makeControl({
     text: textRemove,
     classes: ['control-remove', 'control-remove-col'].concat(baseClasses),
-    handler: () => removeCol(state.matrix)
+    handler: () => wrapControl(removeCol)(removeColBtn, state.matrix)
   });
 
   squresEl.appendChild(addColBtn);
@@ -133,6 +142,8 @@ function addControls() {
   squresEl.appendChild(removeColBtn);
 
   return {
+  	addColBtn,
+  	addRowBtn,
     removeRowBtn,
     removeColBtn
   };
@@ -155,13 +166,21 @@ function isAvailableBtnRemoveRow() {
 	return state.matrix.length > 1;
 }
 
-function showRemoveControls(rowBtn, colBtn) {
+function showRemoveControlsIfAvailable(rowBtn, colBtn) {
 	if (isAvailableBtnRemoveRow()) {
   	changeOpacity(rowBtn, 1);
   }
   if (isAvailableBtnRemoveCol()) {
   	changeOpacity(colBtn, 1);
   }
+}
+
+function genericDelay(fn, ms) {
+   let timer;
+   return function(event) {
+      clearTimeout(timer);
+      timer = setTimeout(fn.bind(null, event), ms || 500);
+   }
 }
 
 function app() {
@@ -174,16 +193,14 @@ function app() {
 
   hideRemoveControls(removeRowBtn, removeColBtn);
 
-  matrixEl.addEventListener('mouseover', ({
-    target
-  }) => {
+  matrixEl.addEventListener('mouseover', ({ target }) => {
 
-    const isMatch = target.matches('.col')
+    const isMatchHoverEl = target.matches('.col')
     	|| target.matches('.clearfix')
     	|| target.matches('.control-remove');
 
-    if (isMatch) {
-      showRemoveControls(removeRowBtn, removeColBtn);
+    if (isMatchHoverEl) {
+      showRemoveControlsIfAvailable(removeRowBtn, removeColBtn);
 
       if (target.matches('.col')) {
         const {
@@ -198,11 +215,9 @@ function app() {
       }
     }
   });
-  matrixEl.addEventListener('mouseout', ({
-    relatedTarget
-  }) => {
-    if (relatedTarget.matches('.control-remove')) {
-      showRemoveControls(removeRowBtn, removeColBtn);
+  matrixEl.addEventListener('mouseout', ({ relatedTarget }) => {
+    if (relatedTarget && relatedTarget.matches('.control-remove')) {
+      showRemoveControlsIfAvailable(removeRowBtn, removeColBtn);
     } else {
     	hideRemoveControls(removeRowBtn, removeColBtn);
     }

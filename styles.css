@@ -28,6 +28,8 @@
 }
 
 .control {
+  display: block;
+  border: none;
   text-align: center;
   vertical-align: middle;
   line-height: 30px;
@@ -46,12 +48,11 @@
 }
 
 .control-row-add-clearfix {
-  margin-left: 4px;
+  margin-left: 2px;
   content: "";
   clear: both;
   display: table;
   top: 0px;
-  left: 10px;
 }
 
 .control-remove {
@@ -68,10 +69,10 @@
 }
 
 .control-remove-row {
-  left: 16px;
+  left: 17px;
 }
 
 .control-remove-col {
-  top: 8px;
+  top: 9px;
 }
 
