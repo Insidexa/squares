@@ -1,6 +1,6 @@
 .squares {
-  margin-left: 40px;
-  margin-top: 40px;
+  margin-left: 60px;
+  margin-top: 60px;
 }
 
 .matrix {
@@ -11,8 +11,8 @@
 }
 
 .el-size {
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   margin: 1px;
 }
 
@@ -69,10 +69,12 @@
 }
 
 .control-remove-row {
-  left: 17px;
+    left: 15px;
+    top: 40px;
 }
 
 .control-remove-col {
-  top: 9px;
+    top: 7px;
+    left: 47px;
 }
 
